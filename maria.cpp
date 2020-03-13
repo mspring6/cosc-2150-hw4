@@ -5,9 +5,9 @@
 #include <stdio.h>
 #include <fstream>
 #include <string>
-#include <queue>
 #include <iomanip>
 #include <memory>
+#include <vector>
 
 using namespace std;
 
@@ -59,9 +59,10 @@ int main(int argc, char** argv) {
 	//string line;
 	long hexNum; 
 	char sharp = '#';
-	queue<int> hexValue;
+	vector<int> hexValue;
 	ifstream inFile;
 	char *ptr;
+	int final_ret;
 
 	//open the file, read input 
 	//push all inputs from file into a queue
@@ -73,50 +74,57 @@ int main(int argc, char** argv) {
 			
 			char hex[30];
 
-			for (int i = 0; i < line.length; i++) {
+			for (int i = 0; i < line.length(); i++) {
 				hex[i] = line[i];
+				//cout << "hex: " << hex[i] << " ";
 			}
-
-			//copy(line.begin(), line.end(), hex);
-
+			
 			if (sharp == hex[0]) {
+				continue;
+			}
+			else if(line.empty()) {
 				continue;
 			}
 			else {
 				hexNum = strtol(hex, &ptr, 16);
-				
-				hexValue.push(hexNum);
+				final_ret = int(hexNum);
+				hexValue.push_back(final_ret);
 			}
 			/*for (int i = 0; i < hexValue.size(); i++) {
-				cout << "hex Value: " << hexValue.front() << endl;
-				hexValue.pop();
+				printf("hex Value: 0x%04\n", hexValue.at(i));
+				
 			}*/
 		}
 	}
+	inFile.close();
 
 	int pc = 0;
 	int ir;
 	int ac;
 	int mar;
 	int mdr;
+	int memory[0xFFFF];
 
 	//fetch cycle
-	for (int i = 0; i <= hexValue.size()+1; i++) {
+	for (int i = 0; i <= hexValue.size(); i++) {
+		ir = hexValue.at(i);
+		//cout << "ir: " << ir << endl;
 		
-
-		ir = hexValue.front();
-		cout << "ir: " << ir << endl;
-		pc++;
 		int hand = 0;
 		int op = 0;
+
+		ir = memory[pc];
+		pc++;
 
 		hand = ir & 0xFFF;
 		op = (ir & 0xF000);
 		op = op >> 12;
-		
-		cout << "op: " << op << endl;
-		cout << "hand: " << hand << endl;
 
+		
+		//cout << "op: " << op << endl;
+		//cout << "hand: " << hand << endl;
+
+		//execute
 		switch(op) {
 			case 0: mdr = pc;
 					mar = hand;
@@ -153,13 +161,6 @@ int main(int argc, char** argv) {
 					break;
 		}
 
-		hexValue.pop();
 	}
-
-    // Loop until 'Halt' instruction 
-
-        // Fetch 
-
-        // Execute 
-
+	return 0;
 }
